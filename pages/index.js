@@ -1,24 +1,86 @@
 import { useState, useEffect, useRef } from 'react';
 
 // --- Icon Components ---
-// Using inline SVGs for icons to avoid extra dependencies.
+const BotIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+        <path fillRule="evenodd" d="M4.5 3.75a3 3 0 00-3 3v10.5a3 3 0 003 3h15a3 3 0 003-3V6.75a3 3 0 00-3-3h-15zm4.125 3a2.25 2.25 0 100 4.5 2.25 2.25 0 000-4.5zm7.125 4.5a2.25 2.25 0 104.5 0 2.25 2.25 0 00-4.5 0zm-7.125 0a2.25 2.25 0 100-4.5 2.25 2.25 0 000 4.5zM12 11.25a3.375 3.375 0 100 6.75 3.375 3.375 0 000-6.75z" clipRule="evenodd" />
+    </svg>
+);
+
+const UserIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+        <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clipRule="evenodd" />
+    </svg>
+);
+
 const SendIcon = (props) => (
   <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" {...props}>
     <path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" />
   </svg>
 );
 
-const BotIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8 text-white">
-        <path fillRule="evenodd" d="M4.5 3.75a3 3 0 00-3 3v10.5a3 3 0 003 3h15a3 3 0 003-3V6.75a3 3 0 00-3-3h-15zm4.125 3a2.25 2.25 0 100 4.5 2.25 2.25 0 000-4.5zm7.125 4.5a2.25 2.25 0 104.5 0 2.25 2.25 0 00-4.5 0zm-7.125 0a2.25 2.25 0 100-4.5 2.25 2.25 0 000 4.5zM12 11.25a3.375 3.375 0 100 6.75 3.375 3.375 0 000-6.75z" clipRule="evenodd" />
-    </svg>
-);
+// --- UI Components ---
 
-const UserIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8 text-white">
-        <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clipRule="evenodd" />
-    </svg>
-);
+// Renders a single chat message bubble
+const ChatMessage = ({ message }) => {
+    const isAssistant = message.role === 'assistant';
+    
+    return (
+        <div className={`flex items-start gap-4 ${!isAssistant && 'flex-row-reverse'}`}>
+            <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${isAssistant ? 'bg-gray-600' : 'bg-blue-500'}`}>
+                {isAssistant ? <BotIcon /> : <UserIcon />}
+            </div>
+            <div className={`p-4 rounded-lg max-w-2xl ${isAssistant ? 'bg-gray-700' : 'bg-blue-600'}`}>
+                <p className="text-base leading-relaxed whitespace-pre-wrap">{message.content}</p>
+            </div>
+        </div>
+    );
+};
+
+// Renders the input form at the bottom
+const ChatInput = ({ input, setInput, handleSendMessage, isLoading }) => {
+    const textareaRef = useRef(null);
+
+    // Auto-resize the textarea based on content
+    useEffect(() => {
+        const textarea = textareaRef.current;
+        if (textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = `${textarea.scrollHeight}px`;
+        }
+    }, [input]);
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleSendMessage(e);
+        }
+    };
+
+    return (
+        <footer className="bg-gray-800/80 backdrop-blur-sm p-4 w-full">
+            <form onSubmit={handleSendMessage} className="max-w-3xl mx-auto flex items-end gap-3">
+                <textarea
+                    ref={textareaRef}
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Type your message..."
+                    className="flex-1 p-3 bg-gray-700 rounded-lg resize-none border-2 border-transparent focus:border-indigo-500 focus:outline-none transition duration-300 max-h-48"
+                    rows="1"
+                    disabled={isLoading}
+                />
+                <button
+                    type="submit"
+                    className="h-12 w-12 flex-shrink-0 bg-indigo-600 rounded-lg text-white flex items-center justify-center hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={isLoading || !input.trim()}
+                >
+                    <SendIcon />
+                </button>
+            </form>
+        </footer>
+    );
+};
 
 
 // --- Main Chat Component ---
@@ -29,47 +91,21 @@ export default function Home() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
-  // --- Refs for advanced scroll control ---
   const messagesEndRef = useRef(null);
-  const chatContainerRef = useRef(null);
-  const wasAtBottomRef = useRef(true);
 
   // --- Scroll logic ---
-  const scrollToBottom = () => {
+  useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  const checkIfAtBottom = () => {
-    const chatContainer = chatContainerRef.current;
-    if (chatContainer) {
-      const { scrollHeight, scrollTop, clientHeight } = chatContainer;
-      wasAtBottomRef.current = Math.abs(scrollHeight - scrollTop - clientHeight) < 5;
-    }
-  };
-
-  // This effect runs before new messages are rendered to check scroll position
-  useEffect(() => {
-    checkIfAtBottom();
-  }, [messages]);
-
-  // This effect runs after messages are rendered to decide whether to scroll
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (wasAtBottomRef.current) {
-        scrollToBottom();
-      }
-    }, 0);
-    return () => clearTimeout(timer);
   }, [messages]);
   
-  // Set document title on mount
+  // --- Set document title ---
   useEffect(() => {
     document.title = "Chat Agent";
   }, []);
 
-  // --- This is where you connect to your DigitalOcean Chatbot ---
+  // --- API Connection Logic (Preserved) ---
   const handleSendMessage = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     const userMessageContent = input.trim();
     if (!userMessageContent) return;
 
@@ -112,67 +148,23 @@ export default function Home() {
 
   return (
     <div className="flex flex-col h-screen bg-gray-800 text-white font-sans">
-      <header className="flex-shrink-0 bg-gray-900 shadow-md p-4 flex items-center space-x-3 z-10">
-        <div className="p-1 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-full">
-            <BotIcon />
+      <main className="flex-1 overflow-y-auto">
+        <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
+            {messages.map((msg, index) => (
+              <ChatMessage key={index} message={msg} />
+            ))}
+            {isLoading && (
+                <ChatMessage message={{ role: 'assistant', content: 'Thinking...' }} />
+            )}
+            <div ref={messagesEndRef} />
         </div>
-        <div>
-            <h1 className="text-xl font-bold">Chat Agent</h1>
-            <p className="text-sm text-green-400">Online</p>
-        </div>
-      </header>
-
-      {/* CORRECTED: Removed inline style and added min-h-0 for a robust flexbox scroll solution. */}
-      <main 
-        ref={chatContainerRef} 
-        className="flex-1 overflow-y-auto p-6 space-y-6 min-h-0"
-      >
-        {messages.map((msg, index) => (
-          <div key={index} className={`flex items-start gap-4 max-w-xl ${msg.role === 'user' ? 'ml-auto flex-row-reverse' : ''}`}>
-            <div className={`p-2 rounded-full ${msg.role === 'user' ? 'bg-blue-600' : 'bg-gray-700'}`}>
-                {msg.role === 'user' ? <UserIcon /> : <BotIcon />}
-            </div>
-            <div className={`px-5 py-3 rounded-2xl shadow-lg ${msg.role === 'user' ? 'bg-blue-600 rounded-br-none' : 'bg-gray-700 rounded-bl-none'}`}>
-              <p className="text-base leading-relaxed whitespace-pre-wrap">{msg.content}</p>
-            </div>
-          </div>
-        ))}
-        {isLoading && (
-            <div className="flex items-start gap-4 max-w-xl">
-                <div className="p-2 bg-gray-700 rounded-full">
-                    <BotIcon />
-                </div>
-                <div className="px-5 py-3 rounded-2xl shadow-lg bg-gray-700 rounded-bl-none">
-                    <div className="flex items-center justify-center space-x-1">
-                        <span className="w-2 h-2 bg-gray-400 rounded-full animate-pulse [animation-delay:-0.3s]"></span>
-                        <span className="w-2 h-2 bg-gray-400 rounded-full animate-pulse [animation-delay:-0.15s]"></span>
-                        <span className="w-2 h-2 bg-gray-400 rounded-full animate-pulse"></span>
-                    </div>
-                </div>
-            </div>
-        )}
-        <div ref={messagesEndRef} />
       </main>
-
-      <footer className="flex-shrink-0 bg-gray-900 p-4 z-10">
-        <form onSubmit={handleSendMessage} className="max-w-3xl mx-auto flex items-center space-x-3">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Type your message..."
-            className="flex-1 p-3 bg-gray-700 rounded-full border-2 border-transparent focus:border-indigo-500 focus:outline-none transition duration-300"
-            disabled={isLoading}
-          />
-          <button
-            type="submit"
-            className="p-3 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-full text-white hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={isLoading || !input.trim()}
-          >
-            <SendIcon />
-          </button>
-        </form>
-      </footer>
+      <ChatInput 
+        input={input}
+        setInput={setInput}
+        handleSendMessage={handleSendMessage}
+        isLoading={isLoading}
+      />
     </div>
   );
 }
