@@ -1,52 +1,51 @@
 import { useState, useEffect, useRef } from 'react';
 
 // --- Icon Components ---
-const BotIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
-        <path fillRule="evenodd" d="M4.5 3.75a3 3 0 00-3 3v10.5a3 3 0 003 3h15a3 3 0 003-3V6.75a3 3 0 00-3-3h-15zm4.125 3a2.25 2.25 0 100 4.5 2.25 2.25 0 000-4.5zm7.125 4.5a2.25 2.25 0 104.5 0 2.25 2.25 0 00-4.5 0zm-7.125 0a2.25 2.25 0 100-4.5 2.25 2.25 0 000 4.5zM12 11.25a3.375 3.375 0 100 6.75 3.375 3.375 0 000-6.75z" clipRule="evenodd" />
-    </svg>
+const LogoIcon = () => (
+    // Using the uploaded logomark. Ensure it is in the /public folder.
+    <img src="/uie-logomark.png" alt="Uie Assist Logo" className="w-6 h-6" />
 );
 
 const UserIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
-        <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clipRule="evenodd" />
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
     </svg>
 );
 
 const SendIcon = (props) => (
   <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" {...props}>
-    <path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" />
+    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
   </svg>
 );
 
 // --- UI Components ---
 
-// Renders a single chat message bubble
 const ChatMessage = ({ message }) => {
     const isAssistant = message.role === 'assistant';
-    
     return (
-        <div className={`flex items-start gap-4 ${!isAssistant && 'flex-row-reverse'}`}>
-            <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${isAssistant ? 'bg-gray-600' : 'bg-blue-500'}`}>
-                {isAssistant ? <BotIcon /> : <UserIcon />}
+        <div className="w-full max-w-3xl mx-auto flex items-start gap-4 px-4">
+            <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-gray-700">
+                {isAssistant ? <LogoIcon /> : <UserIcon />}
             </div>
-            <div className={`p-4 rounded-lg max-w-2xl ${isAssistant ? 'bg-gray-700' : 'bg-blue-600'}`}>
-                <p className="text-base leading-relaxed whitespace-pre-wrap">{message.content}</p>
+            <div className="flex-grow pt-1">
+                <p className="font-semibold text-gray-100">{isAssistant ? 'Uie Assist' : 'You'}</p>
+                <div className="text-gray-300 text-base leading-relaxed whitespace-pre-wrap">
+                    {message.content}
+                </div>
             </div>
         </div>
     );
 };
 
-// Renders the input form at the bottom
 const ChatInput = ({ input, setInput, handleSendMessage, isLoading }) => {
     const textareaRef = useRef(null);
 
-    // Auto-resize the textarea based on content
     useEffect(() => {
         const textarea = textareaRef.current;
         if (textarea) {
             textarea.style.height = 'auto';
-            textarea.style.height = `${textarea.scrollHeight}px`;
+            const scrollHeight = textarea.scrollHeight;
+            textarea.style.height = `${scrollHeight}px`;
         }
     }, [input]);
 
@@ -58,30 +57,32 @@ const ChatInput = ({ input, setInput, handleSendMessage, isLoading }) => {
     };
 
     return (
-        <footer className="bg-gray-800/80 backdrop-blur-sm p-4 w-full">
-            <form onSubmit={handleSendMessage} className="max-w-3xl mx-auto flex items-end gap-3">
+        <div className="w-full bg-gray-900/80 backdrop-blur-sm pt-2 pb-4">
+            <form 
+                onSubmit={handleSendMessage} 
+                className="max-w-3xl mx-auto p-2 flex items-end bg-gray-800 border border-gray-700 rounded-2xl shadow-lg"
+            >
                 <textarea
                     ref={textareaRef}
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder="Type your message..."
-                    className="flex-1 p-3 bg-gray-700 rounded-lg resize-none border-2 border-transparent focus:border-indigo-500 focus:outline-none transition duration-300 max-h-48"
+                    placeholder="Describe your machinery problem..."
+                    className="flex-1 bg-transparent text-white placeholder-gray-500 focus:outline-none resize-none px-4 py-2 max-h-48"
                     rows="1"
                     disabled={isLoading}
                 />
                 <button
                     type="submit"
-                    className="h-12 w-12 flex-shrink-0 bg-indigo-600 rounded-lg text-white flex items-center justify-center hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-10 h-10 flex-shrink-0 bg-indigo-600 rounded-full text-white flex items-center justify-center hover:bg-indigo-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={isLoading || !input.trim()}
                 >
-                    <SendIcon />
+                    <SendIcon className="w-5 h-5" />
                 </button>
             </form>
-        </footer>
+        </div>
     );
 };
-
 
 // --- Main Chat Component ---
 export default function Home() {
@@ -93,14 +94,12 @@ export default function Home() {
   
   const messagesEndRef = useRef(null);
 
-  // --- Scroll logic ---
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [messages, isLoading]);
   
-  // --- Set document title ---
   useEffect(() => {
-    document.title = "Chat Agent";
+    document.title = "Uie Assist";
   }, []);
 
   // --- API Connection Logic (Preserved) ---
@@ -147,24 +146,41 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-800 text-white font-sans">
-      <main className="flex-1 overflow-y-auto">
-        <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
-            {messages.map((msg, index) => (
-              <ChatMessage key={index} message={msg} />
-            ))}
-            {isLoading && (
-                <ChatMessage message={{ role: 'assistant', content: 'Thinking...' }} />
-            )}
-            <div ref={messagesEndRef} />
+    <div className="flex h-screen bg-gray-900 text-white font-sans">
+        {/* Main Content Area */}
+        <div className="flex-1 flex flex-col">
+            <header className="p-4 border-b border-gray-700 text-center">
+                <h1 className="text-2xl font-bold text-gray-100">Uie Assist</h1>
+                <p className="text-sm text-gray-400">Ai help for machinery analysis</p>
+            </header>
+            
+            <div className="flex-1 overflow-y-auto">
+                <div className="pt-8 pb-4 space-y-8">
+                    {messages.map((msg, index) => (
+                      <ChatMessage key={index} message={msg} />
+                    ))}
+                    {isLoading && (
+                        <div className="w-full max-w-3xl mx-auto flex items-start gap-4 px-4">
+                            <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-gray-700">
+                                <LogoIcon />
+                            </div>
+                            <div className="flex-grow pt-1">
+                                <p className="font-semibold text-gray-100">Uie Assist</p>
+                                <div className="w-2 h-2 mt-2 bg-indigo-500 rounded-full animate-pulse"></div>
+                            </div>
+                        </div>
+                    )}
+                    <div ref={messagesEndRef} />
+                </div>
+            </div>
+
+            <ChatInput 
+                input={input}
+                setInput={setInput}
+                handleSendMessage={handleSendMessage}
+                isLoading={isLoading}
+            />
         </div>
-      </main>
-      <ChatInput 
-        input={input}
-        setInput={setInput}
-        handleSendMessage={handleSendMessage}
-        isLoading={isLoading}
-      />
     </div>
   );
 }
