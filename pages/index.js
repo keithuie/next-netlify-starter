@@ -111,7 +111,8 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="flex-1 overflow-y-auto p-6 space-y-6">
+      {/* CORRECTED: Added 'min-h-0' to fix the scrolling issue with long content. */}
+      <main className="flex-1 overflow-y-auto p-6 space-y-6 min-h-0">
         {messages.map((msg, index) => (
           <div key={index} className={`flex items-start gap-4 max-w-xl ${msg.role === 'user' ? 'ml-auto flex-row-reverse' : ''}`}>
             <div className={`p-2 rounded-full ${msg.role === 'user' ? 'bg-blue-600' : 'bg-gray-700'}`}>
