@@ -34,7 +34,7 @@ export default function Home() {
   const chatContainerRef = useRef(null);
   const wasAtBottomRef = useRef(true);
 
-  // --- New scroll logic from user ---
+  // --- Scroll logic ---
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -43,7 +43,6 @@ export default function Home() {
     const chatContainer = chatContainerRef.current;
     if (chatContainer) {
       const { scrollHeight, scrollTop, clientHeight } = chatContainer;
-      // Check if user is within a small tolerance of the bottom
       wasAtBottomRef.current = Math.abs(scrollHeight - scrollTop - clientHeight) < 5;
     }
   };
@@ -55,7 +54,6 @@ export default function Home() {
 
   // This effect runs after messages are rendered to decide whether to scroll
   useEffect(() => {
-    // Use a short timeout to ensure the DOM has updated
     const timer = setTimeout(() => {
       if (wasAtBottomRef.current) {
         scrollToBottom();
@@ -104,8 +102,7 @@ export default function Home() {
       const data = await response.json();
       const botReply = data.choices && data.choices[0] ? data.choices[0].message.content : "Sorry, I couldn't get a response.";
       setMessages(prev => [...prev, { role: 'assistant', content: botReply }]);
-    } catch (error)
-{
+    } catch (error) {
       console.error("Failed to connect to the chatbot:", error);
       setMessages(prev => [...prev, { role: 'assistant', content: "Sorry, I'm having trouble connecting. Please check the console for errors." }]);
     } finally {
@@ -125,11 +122,10 @@ export default function Home() {
         </div>
       </header>
 
-      {/* CORRECTED: Using inline style with calc() for a robust height calculation to fix scrolling. */}
+      {/* CORRECTED: Removed inline style and added min-h-0 for a robust flexbox scroll solution. */}
       <main 
         ref={chatContainerRef} 
-        className="flex-1 overflow-y-auto p-6 space-y-6"
-        style={{ maxHeight: 'calc(100vh - 128px)' }} // 128px is an approximation for header + footer height
+        className="flex-1 overflow-y-auto p-6 space-y-6 min-h-0"
       >
         {messages.map((msg, index) => (
           <div key={index} className={`flex items-start gap-4 max-w-xl ${msg.role === 'user' ? 'ml-auto flex-row-reverse' : ''}`}>
