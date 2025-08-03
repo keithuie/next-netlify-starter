@@ -101,7 +101,8 @@ export default function Home() {
 
   return (
     <div className="flex flex-col h-screen bg-gray-800 text-white font-sans">
-      <header className="bg-gray-900 shadow-md p-4 flex items-center space-x-3 sticky top-0 z-10">
+      {/* CORRECTED: Removed sticky positioning and added flex-shrink-0 for a more robust flexbox layout. */}
+      <header className="flex-shrink-0 bg-gray-900 shadow-md p-4 flex items-center space-x-3 z-10">
         <div className="p-1 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-full">
             <BotIcon />
         </div>
@@ -111,8 +112,8 @@ export default function Home() {
         </div>
       </header>
 
-      {/* CORRECTED: Added 'min-h-0' to fix the scrolling issue with long content. */}
-      <main className="flex-1 overflow-y-auto p-6 space-y-6 min-h-0">
+      {/* CORRECTED: This flex-1 and overflow-y-auto setup will now work correctly. */}
+      <main className="flex-1 overflow-y-auto p-6 space-y-6">
         {messages.map((msg, index) => (
           <div key={index} className={`flex items-start gap-4 max-w-xl ${msg.role === 'user' ? 'ml-auto flex-row-reverse' : ''}`}>
             <div className={`p-2 rounded-full ${msg.role === 'user' ? 'bg-blue-600' : 'bg-gray-700'}`}>
@@ -140,7 +141,8 @@ export default function Home() {
         <div ref={messagesEndRef} />
       </main>
 
-      <footer className="bg-gray-900 p-4 sticky bottom-0 z-10">
+      {/* CORRECTED: Removed sticky positioning and added flex-shrink-0 for a more robust flexbox layout. */}
+      <footer className="flex-shrink-0 bg-gray-900 p-4 z-10">
         <form onSubmit={handleSendMessage} className="max-w-3xl mx-auto flex items-center space-x-3">
           <input
             type="text"
