@@ -162,6 +162,19 @@ const SUBREGION_COLORS = {
 
 // Rate limiting removed for faster loading
 
+// Helper component to get map instance
+function MapController({ onMapReady }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (map && onMapReady) {
+      onMapReady(map);
+    }
+  }, [map, onMapReady]);
+
+  return null;
+}
+
 // MarkerCluster component
 function MarkerClusterGroup({ children, map }) {
   const markerClusterGroupRef = useRef(null);
@@ -666,8 +679,8 @@ export default function MapComponent() {
           center={[51.5074, -0.5]}
           zoom={9}
           style={{ height: '100%', width: '100%' }}
-          whenCreated={(map) => { mapRef.current = map; }}
         >
+          <MapController onMapReady={(map) => { mapRef.current = map; }} />
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
