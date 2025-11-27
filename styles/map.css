@@ -1,0 +1,57 @@
+/* Custom Pin Marker */
+.custom-pin-marker {
+  background: transparent !important;
+  border: none !important;
+}
+
+.custom-pin-marker svg {
+  filter: drop-shadow(0 3px 3px rgba(0,0,0,0.3));
+}
+
+/* Cluster styling */
+.marker-cluster-small {
+  background-color: rgba(0, 102, 164, 0.6) !important;
+}
+
+.marker-cluster-small div {
+  background-color: rgba(0, 102, 164, 0.8) !important;
+}
+
+.marker-cluster-medium {
+  background-color: rgba(0, 102, 164, 0.6) !important;
+}
+
+.marker-cluster-medium div {
+  background-color: rgba(0, 102, 164, 0.8) !important;
+}
+
+.marker-cluster-large {
+  background-color: rgba(0, 102, 164, 0.6) !important;
+}
+
+.marker-cluster-large div {
+  background-color: rgba(0, 102, 164, 0.8) !important;
+}
+
+.marker-cluster div {
+  color: white !important;
+  font-weight: bold !important;
+}
+
+/* Leaflet popup customization */
+.leaflet-popup-content-wrapper {
+  border-radius: 8px;
+}
+
+.leaflet-popup-content {
+  margin: 12px 15px;
+  min-width: 220px;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .leaflet-popup-content {
+    min-width: 180px;
+    font-size: 11px;
+  }
+}
