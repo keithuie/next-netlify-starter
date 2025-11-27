@@ -302,6 +302,7 @@ export default function MapComponent() {
   const [regionFilter, setRegionFilter] = useState('');
   const [subregionFilter, setSubregionFilter] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [map, setMap] = useState(null);
   const mapRef = useRef(null);
 
   // Parse CSV
@@ -372,6 +373,17 @@ export default function MapComponent() {
   };
 
   const geocodePostalCode = async (postalCode) => {
+    // Manual coordinates for incomplete postal codes
+    const manualCoordinates = {
+      'N4': { lat: 51.5583, lng: -0.0909 }, // Stoke Newington, Hackney
+      'NW8': { lat: 51.5341, lng: -0.1752 }, // St John's Wood
+      'NW10': { lat: 51.5362, lng: -0.2417 } // Willesden
+    };
+
+    if (manualCoordinates[postalCode]) {
+      return manualCoordinates[postalCode];
+    }
+
     const url = `https://nominatim.openstreetmap.org/search?postalcode=${encodeURIComponent(postalCode)}&country=United+Kingdom&format=json&limit=1`;
 
     const response = await fetch(url, {
@@ -440,8 +452,8 @@ export default function MapComponent() {
   const subregions = [...new Set(allSites.map(s => s.subRegion))];
 
   const handleSiteClick = (site) => {
-    if (mapRef.current) {
-      mapRef.current.setView([site.lat, site.lng], 14);
+    if (map) {
+      map.setView([site.lat, site.lng], 14);
     }
   };
 
@@ -497,13 +509,13 @@ export default function MapComponent() {
 
   return (
     <div style={{ display: 'flex', height: '100vh', position: 'relative' }}>
-      {/* Mobile toggle button */}
+      {/* Sidebar toggle button */}
       <button
         onClick={() => setSidebarOpen(!sidebarOpen)}
         style={{
           position: 'absolute',
           top: '10px',
-          left: sidebarOpen ? '360px' : '10px',
+          right: '10px',
           zIndex: 1001,
           background: '#0066a4',
           color: 'white',
@@ -512,8 +524,7 @@ export default function MapComponent() {
           padding: '10px 15px',
           cursor: 'pointer',
           fontSize: '18px',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-          transition: 'left 0.3s'
+          boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
         }}
       >
         {sidebarOpen ? '✕' : '☰'}
@@ -549,7 +560,9 @@ export default function MapComponent() {
               padding: '10px',
               border: 'none',
               borderRadius: '5px',
-              fontSize: '14px'
+              fontSize: '14px',
+              color: '#495057',
+              background: 'white'
             }}
           />
         </div>
@@ -680,12 +693,15 @@ export default function MapComponent() {
           zoom={9}
           style={{ height: '100%', width: '100%' }}
         >
-          <MapController onMapReady={(map) => { mapRef.current = map; }} />
+          <MapController onMapReady={(mapInstance) => {
+            mapRef.current = mapInstance;
+            setMap(mapInstance);
+          }} />
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          <SiteMarkers sites={filteredSites} map={mapRef.current} />
+          <SiteMarkers sites={filteredSites} map={map} />
         </MapContainer>
       </div>
     </div>
