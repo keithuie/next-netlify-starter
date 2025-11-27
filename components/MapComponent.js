@@ -146,7 +146,7 @@ Willesden RES & WBS,https://what3words.com/pretty.spell.traps,NW10,London,North 
 Witheridge Hill WTW,https://what3words.com/enjoys.enforced.broached,RG9 5PJ,Thames Valley,Thames Valley West,2
 Woodcote RES & WBS,https://what3words.com/ramming.mermaids.observers,RG8 0RH,Thames Valley,Thames Valley West,4
 West Wickham RES & WBS,https://what3words.com/royal.priced.tree,BR2 6AR,London,South East London,1
-Addington Res & WBS,https://what3words.com/test.advice.actors,CRO 5RE,London,South East London,3
+Addington Res & WBS,https://what3words.com/test.advice.actors,CR0 5RE,London,South East London,3
 Aldbury WBS,https://what3words.com/afflicted.levels.unroll,HP23 5RU,Thames Valley,Thames Valley East,2`;
 
 const SUBREGION_COLORS = {
