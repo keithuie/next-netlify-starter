@@ -4,8 +4,8 @@ import GoogleProvider from 'next-auth/providers/google';
 export const authOptions = {
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      clientId: process.env.GOOGLE_CLIENT_ID || 'dummy-client-id',
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || 'dummy-secret',
     }),
   ],
   pages: {
@@ -17,7 +17,7 @@ export const authOptions = {
       return baseUrl + '/map';
     },
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET || 'dummy-secret-for-build',
 };
 
 export default NextAuth(authOptions);
