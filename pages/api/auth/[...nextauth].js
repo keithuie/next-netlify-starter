@@ -1,0 +1,23 @@
+import NextAuth from 'next-auth';
+import GoogleProvider from 'next-auth/providers/google';
+
+export const authOptions = {
+  providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID || 'dummy-client-id',
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || 'dummy-secret',
+    }),
+  ],
+  pages: {
+    signIn: '/login',
+  },
+  callbacks: {
+    async redirect({ url, baseUrl }) {
+      // Redirect to map page after login
+      return baseUrl + '/map';
+    },
+  },
+  secret: process.env.NEXTAUTH_SECRET || 'dummy-secret-for-build',
+};
+
+export default NextAuth(authOptions);
