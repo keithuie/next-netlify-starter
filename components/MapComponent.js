@@ -160,7 +160,7 @@ const SUBREGION_COLORS = {
   'Guildford & SWS': '#00bcd4'
 };
 
-const NOMINATIM_DELAY_MS = 1100;
+// Rate limiting removed for faster loading
 
 // MarkerCluster component
 function MarkerClusterGroup({ children, map }) {
@@ -227,8 +227,8 @@ function SiteMarkers({ sites, map, onMarkerClick }) {
 
       const marker = L.marker([site.lat, site.lng], { icon });
 
-      const googleMapsUrl = `https://www.google.com/maps?q=${site.lat},${site.lng}`;
       const w3wUrl = site.w3wUrl || '#';
+      const assetCount = site.assetCount || 0;
 
       const popupContent = `
         <div style="min-width: 220px;">
@@ -241,15 +241,15 @@ function SiteMarkers({ sites, map, onMarkerClick }) {
           <div style="font-size: 12px; margin-bottom: 4px; color: #495057;">
             <strong>Region:</strong> ${site.region}
           </div>
-          <div style="font-size: 12px; margin-bottom: 12px; color: #495057;">
+          <div style="font-size: 12px; margin-bottom: 4px; color: #495057;">
             <strong>Sub-region:</strong> ${site.subRegion}
           </div>
+          ${assetCount > 0 ? `<div style="font-size: 12px; margin-bottom: 12px; color: #495057;">
+            <strong>Assets:</strong> ${assetCount}
+          </div>` : '<div style="margin-bottom: 12px;"></div>'}
           <div style="display: flex; flex-direction: column; gap: 6px;">
             <a href="${w3wUrl}" target="_blank" style="display: inline-block; padding: 8px 12px; background: #e11f26; color: white; text-decoration: none; border-radius: 4px; font-size: 12px; font-weight: 500; text-align: center;">
               📍 Precise Location (What3Words)
-            </a>
-            <a href="${googleMapsUrl}" target="_blank" style="display: inline-block; padding: 8px 12px; background: #34a853; color: white; text-decoration: none; border-radius: 4px; font-size: 12px; font-weight: 500; text-align: center;">
-              🗺️ Navigate (Google Maps)
             </a>
           </div>
         </div>
@@ -394,10 +394,6 @@ export default function MapComponent() {
       }
 
       setProgress({ current: i + 1, total });
-
-      if (i < sites.length - 1) {
-        await new Promise(resolve => setTimeout(resolve, NOMINATIM_DELAY_MS));
-      }
     }
 
     setErrors(localErrors);
