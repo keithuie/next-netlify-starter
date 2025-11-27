@@ -31,3 +31,6 @@ yarn-error.log*
 
 # Local Netlify folder
 .netlify
+
+# Geocoding script outputs
+data/geocoding-errors.json
