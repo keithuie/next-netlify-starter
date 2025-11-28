@@ -63,20 +63,21 @@ export default function MapPage() {
       </Head>
 
       <div style={{ position: 'relative', height: '100vh', width: '100%' }}>
-        {/* User info bar */}
+        {/* User info bar - positioned to not block map controls */}
         <div style={{
           position: 'absolute',
-          top: 0,
-          right: 0,
-          zIndex: 1000,
+          top: '60px',
+          right: '10px',
+          zIndex: 999,
           background: 'white',
-          padding: '10px 15px',
+          padding: '8px 12px',
           boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+          borderRadius: '4px',
           display: 'flex',
           alignItems: 'center',
-          gap: '10px',
+          gap: '8px',
         }}>
-          <span style={{ fontSize: '14px' }}>
+          <span style={{ fontSize: '13px', display: 'none' }} className="user-name-desktop">
             {session.user.name}
           </span>
           {session.user.image && (
@@ -84,8 +85,8 @@ export default function MapPage() {
               src={session.user.image}
               alt="Profile"
               style={{
-                width: '32px',
-                height: '32px',
+                width: '28px',
+                height: '28px',
                 borderRadius: '50%'
               }}
             />
@@ -93,13 +94,13 @@ export default function MapPage() {
           <button
             onClick={() => signOut({ callbackUrl: '/login' })}
             style={{
-              padding: '6px 12px',
+              padding: '5px 10px',
               background: '#dc3545',
               color: 'white',
               border: 'none',
               borderRadius: '4px',
               cursor: 'pointer',
-              fontSize: '13px',
+              fontSize: '12px',
             }}
           >
             Sign Out
@@ -107,6 +108,14 @@ export default function MapPage() {
         </div>
 
         <MapComponent />
+
+        <style jsx>{`
+          @media (min-width: 768px) {
+            .user-name-desktop {
+              display: inline !important;
+            }
+          }
+        `}</style>
       </div>
     </>
   );

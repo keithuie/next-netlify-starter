@@ -64,11 +64,15 @@ function SiteMarkers({ sites, map, onMarkerClick }) {
     if (!map || !sites || sites.length === 0) return;
 
     if (!markerClusterGroupRef.current) {
+      // Optimize clustering for mobile performance
+      const isMobile = window.innerWidth < 768;
       markerClusterGroupRef.current = L.markerClusterGroup({
-        maxClusterRadius: 50,
+        maxClusterRadius: isMobile ? 80 : 50,
         spiderfyOnMaxZoom: true,
         showCoverageOnHover: false,
-        zoomToBoundsOnClick: true
+        zoomToBoundsOnClick: true,
+        disableClusteringAtZoom: isMobile ? 15 : null,
+        animate: !isMobile // Disable animations on mobile for better performance
       });
       map.addLayer(markerClusterGroupRef.current);
     }
@@ -154,7 +158,7 @@ export default function MapComponent() {
   const [searchTerm, setSearchTerm] = useState('');
   const [regionFilter, setRegionFilter] = useState('');
   const [subregionFilter, setSubregionFilter] = useState('');
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false); // Hidden by default on mobile
   const [map, setMap] = useState(null);
   const mapRef = useRef(null);
 
@@ -163,6 +167,16 @@ export default function MapComponent() {
     setAllSites(siteCoordinates);
     setFilteredSites(siteCoordinates);
     setLoading(false);
+
+    // Show sidebar by default on desktop
+    const checkDesktop = () => {
+      if (window.innerWidth >= 768) {
+        setSidebarOpen(true);
+      }
+    };
+    checkDesktop();
+    window.addEventListener('resize', checkDesktop);
+    return () => window.removeEventListener('resize', checkDesktop);
   }, []);
 
   useEffect(() => {
@@ -181,6 +195,10 @@ export default function MapComponent() {
   const handleSiteClick = (site) => {
     if (map) {
       map.setView([site.lat, site.lng], 14);
+      // Close sidebar on mobile after clicking a site
+      if (window.innerWidth < 768) {
+        setSidebarOpen(false);
+      }
     }
   };
 
@@ -226,6 +244,7 @@ export default function MapComponent() {
       {/* Sidebar */}
       <div style={{
         width: '350px',
+        maxWidth: '85vw',
         height: '100vh',
         background: '#f8f9fa',
         borderRight: '1px solid #dee2e6',
@@ -235,7 +254,8 @@ export default function MapComponent() {
         left: 0,
         top: 0,
         zIndex: 1000,
-        overflowY: 'auto'
+        overflowY: 'auto',
+        WebkitOverflowScrolling: 'touch'
       }}>
         <div style={{
           padding: '15px',
@@ -379,12 +399,14 @@ export default function MapComponent() {
       <div style={{
         flex: 1,
         marginLeft: sidebarOpen ? '350px' : '0',
-        transition: 'margin-left 0.3s'
+        transition: 'margin-left 0.3s',
+        touchAction: 'pan-x pan-y'
       }}>
         <MapContainer
           center={[51.5074, -0.5]}
           zoom={9}
           style={{ height: '100%', width: '100%' }}
+          preferCanvas={true}
         >
           <MapController onMapReady={(mapInstance) => {
             mapRef.current = mapInstance;
